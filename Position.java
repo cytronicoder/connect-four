@@ -65,11 +65,15 @@ public class Position {
      * The move string is a sequence of characters '1' to '7' representing the column to move to.
      * @param move The move string to make.
      */
-    public void move(String move) {
+    public int move(String move) {
         for (int i = 0; i < move.length(); i++) {
             int column = move.charAt(i) - '1';
+            if(column < 0 || column >= Position.WIDTH || !canMove(column) || canWin(column)) {
+                return i;
+            }
             move(column);
         }
+        return move.length();
     }
     
     /**
