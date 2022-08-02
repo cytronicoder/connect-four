@@ -20,7 +20,7 @@ I have previously done this project using a simple Minimax algorithm, but I have
   - [X] MinMax algorithm
   - [X] Alpha-beta algorithm
   - [X] Move exploration order
-  - [ ] Bitboard
+  - [ ] [Bitboard](https://github.com/cytronicoder/connect-four/issues/1)
   - [ ] Transposition table
   - [ ] Iterative deepening
   - [ ] Anticipate losing moves
