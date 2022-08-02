@@ -16,7 +16,17 @@ I have previously done this project using a simple Minimax algorithm, but I have
   - [ ] Display game board and its current state
   - [ ] Chip placement and conditions
   - [ ] Check if a player has won
-- [ ] Algorithm soon™
+- [ ] Algorithm
+  - [X] MinMax algorithm
+  - [X] Alpha-beta algorithm
+  - [X] Move exploration order
+  - [ ] Bitboard
+  - [ ] Transposition table
+  - [ ] Iterative deepening
+  - [ ] Anticipate losing moves
+  - [ ] Better move ordering
+  - [ ] Optimized transposition table
+  - [ ] Lower bound transposition table
 
 ## Acknowledgements
 
