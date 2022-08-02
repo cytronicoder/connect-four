@@ -4,7 +4,7 @@ public class Position {
 
     private int board[][] = new int[WIDTH][HEIGHT]; // 2D array of the board
     private int height[] = new int[WIDTH]; // 1D array of the height of each column
-    private int moves = 0; // Number of moves made so far
+    private int moves; // Number of moves made so far
 
     /** Constructor */
     public Position() {
@@ -14,26 +14,31 @@ public class Position {
                 board[i][j] = 0;
             }
         }
+
         // Initialize the height of each column to 0
         for (int i = 0; i < WIDTH; i++) {
             height[i] = 0;
         }
+
+        // Initialize the moves to 0
+        moves = 0;
     }
 
-    /** Copy constructor */
-    public Position(Position other) {
+    public Position(Position pos) {
         // Copy the board
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
-                board[i][j] = other.board[i][j];
+                board[i][j] = pos.board[i][j];
             }
         }
+
         // Copy the height
         for (int i = 0; i < WIDTH; i++) {
-            height[i] = other.height[i];
+            height[i] = pos.height[i];
         }
-        // Copy the number of moves
-        moves = other.moves;
+
+        // Copy the moves
+        moves = pos.moves;
     }
 
     /**
@@ -48,29 +53,23 @@ public class Position {
     /**
      * Make a move at the given column.
      * @param column The column to make the move at.
-     * @return True if the move was successful, false otherwise.
      */
-    public boolean move(int column) {
-        if (canMove(column)) {
-            board[column][height[column]] = moves % 2 + 1;
-            height[column]++;
-            moves++;
-            return true;
-        }
-        return false;
+    public void move(int column) {
+        board[column][height[column]] = moves % 2 + 1;
+        height[column]++;
+        moves++;
     }
 
     /**
      * Make a move based on the given move string.
      * The move string is a sequence of characters '1' to '7' representing the column to move to.
      * @param move The move string to make.
+     * @return The number of moves made.
      */
     public int move(String move) {
         for (int i = 0; i < move.length(); i++) {
             int column = move.charAt(i) - '1';
-            if(column < 0 || column >= Position.WIDTH || !canMove(column) || canWin(column)) {
-                return i;
-            }
+            if(column < 0 || column >= Position.WIDTH || !canMove(column) || isWinningMove(column)) return i;
             move(column);
         }
         return move.length();
@@ -81,14 +80,14 @@ public class Position {
      * @param column The column to check.
      * @return True if there is a winning move for the current player in the given column.
      */
-    public boolean canWin(int column) {
+    public boolean isWinningMove(int column) {
         int currentPlayer = moves % 2 + 1;
         
-        if (height[column] >= 3
-            && board[column][height[column] - 1] == currentPlayer
-            && board[column][height[column] - 2] == currentPlayer
+        if(height[column] >= 3 
+            && board[column][height[column] - 1] == currentPlayer 
+            && board[column][height[column] - 2] == currentPlayer 
             && board[column][height[column] - 3] == currentPlayer) {
-            return false;
+          return true;
         }
 
         for (int dy = -1; dy <= 1; dy++) {
@@ -100,22 +99,7 @@ public class Position {
                     x += dx;
                     y += dx * dy;
                 }
-                if (nb >= 3) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if the game has been won.
-     * @return True if the game has been won.
-     */
-    public boolean isWon() {
-        for (int i = 0; i < WIDTH; i++) {
-            if (canWin(i)) {
-                return true;
+                if(nb >= 3) return true;
             }
         }
         return false;

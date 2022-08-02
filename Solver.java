@@ -1,6 +1,9 @@
 import java.util.Scanner;
 import java.io.*;
 
+// https://stackoverflow.com/a/45444716
+import util.ConsoleColors;
+
 public class Solver {
     private long nodeCount;
     private int columnOrder[] = new int[Position.WIDTH];
@@ -13,22 +16,19 @@ public class Solver {
     private int negamax(Position pos, int alpha, int beta) {
         nodeCount++;
 
-        if (pos.getMoves() == Position.WIDTH * Position.HEIGHT) {
-            return 0;
-        }
+        if (pos.getMoves() == Position.WIDTH * Position.HEIGHT) return 0;
 
         for (int x = 0; x < Position.WIDTH; x++) {
-            if(pos.canMove(x) && pos.canWin(x)) {
-                return (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves())/ 2;
+            if(pos.canMove(x) && pos.isWinningMove(x)) {
+                return (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves())/2;
             }
         }
         
-        int max = (Position.WIDTH * Position.HEIGHT - 1 - pos.getMoves())/ 2;
+        int max = (Position.WIDTH * Position.HEIGHT - 1 - pos.getMoves())/2;
+        
         if (beta > max) {
             beta = max;
-            if (alpha >= beta) {
-                return beta;
-            }
+            if (alpha >= beta) return beta;
         }
         
         for (int x = 0; x < Position.WIDTH; x++) {
@@ -36,31 +36,11 @@ public class Solver {
                 Position newPos = new Position(pos);
                 newPos.move(columnOrder[x]);
                 int score = -negamax(newPos, -beta, -alpha);
-                if (score >= beta) {
-                    return score;
-                }
-                if (score > alpha) {
-                    alpha = score;
-                }
+                if (score >= beta) return score;
+                if (score > alpha) alpha = score;
             }
         }
-
-        return alpha;
-
-        // int bestScore = -Position.WIDTH * Position.HEIGHT;
-
-        // for (int x = 0; x < Position.WIDTH; x++) {
-        //     if (pos.canMove(x)) {
-        //         Position newPos = new Position(pos);
-        //         newPos.move(x);
-        //         int score = -negamax(newPos);
-        //         if (score > bestScore) {
-        //             bestScore = score;
-        //         }
-        //     }
-        // }
-
-        // return bestScore;
+      return alpha;
     }
 
     public int solve(Position pos, boolean weak) {
@@ -77,8 +57,9 @@ public class Solver {
     }
 
     public Solver() {
+        nodeCount = 0;
         for (int i = 0; i < Position.WIDTH; i++) {
-            columnOrder[i] = Position.WIDTH / 2 + ( 1 - 2 * (i % 2)) * (i + 1) / 2;
+            columnOrder[i] = Position.WIDTH / 2 + (1 - 2 * (i % 2)) * (i + 1) / 2;
         }
     }
 
@@ -86,6 +67,9 @@ public class Solver {
     public static void main(String[] args) throws Exception {
         Solver solver = new Solver();
         Scanner in = new Scanner(System.in);
+
+        // Configuration
+        boolean weak = false;
 
         /** Read in the test data from the test folder
          * Parse the input and call the solver to get the score
@@ -95,8 +79,6 @@ public class Solver {
         BufferedReader br = new BufferedReader(new FileReader(test));
         
         String line;
-
-        boolean weak = false;
 
         // line = br.readLine();
         for (int i = 0; (line = br.readLine()) != null; i++) {
@@ -108,13 +90,16 @@ public class Solver {
 
             int startTime = (int) System.currentTimeMillis();
             if (pos.move(moves) != moves.length()) {
-                System.out.println("Move " + (pos.getMoves() + 1) + " failed on line " + i);
+                System.out.print(ConsoleColors.RED + "Move " + (pos.getMoves() + 1) + " failed on line " + i + ConsoleColors.RESET);
             } else if (solver.solve(pos, weak) != score) {
-                System.out.println("Score failed on line " + i + ": Expected " + score + ", got " + solver.solve(pos, weak));
+                System.out.print(ConsoleColors.RED_BRIGHT + "Score failed on line " + i + ": Expected " + score + ", got " + solver.solve(pos, weak) + ": " + moves + ConsoleColors.RESET);
             } else {
-                int endTime = (int) System.currentTimeMillis();
-                System.out.println("Test passed on line " + i + ": " + moves + " " + score + " " + (endTime - startTime) + "ms");
+                System.out.print(ConsoleColors.GREEN + "Test passed on line " + i + ": " + moves + " " + score + ConsoleColors.RESET);
             }
+
+            // Print the time taken to solve the test
+            int endTime = (int) System.currentTimeMillis();
+            System.out.println(" in " + (endTime - startTime) + "ms");
         }
 
         br.close();
