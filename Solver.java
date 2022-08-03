@@ -1,6 +1,6 @@
 public class Solver {
-    private long nodeCount;
-    private int columnOrder[] = new int[Position.WIDTH];
+    private static long nodeCount;
+    private static int columnOrder[] = new int[Position.WIDTH];
 
     /** Constructor */
     public Solver() {
@@ -15,7 +15,7 @@ public class Solver {
      * a negative score if the opponent has a winning move,
      * and a score of 0 if neither player has a winning move.
      */
-    private int negamax(Position pos, int alpha, int beta) {
+    private static int negamax(Position pos, int alpha, int beta) {
         nodeCount++;
 
         if (pos.getMoves() == Position.WIDTH * Position.HEIGHT) return 0;

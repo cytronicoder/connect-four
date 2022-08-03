@@ -105,6 +105,69 @@ public class Position {
         return false;
     }
 
+    /** Check if a player has won the game.
+     * @param player The player to check.
+     * @return True if the player has won the game.
+     */
+    public boolean hasWon(int player) {
+        // horizontal
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH - 3; j++) {
+                if (board[j][i] == player && board[j + 1][i] == player && board[j + 2][i] == player && board[j + 3][i] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // vertical
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT - 3; j++) {
+                if (board[i][j] == player && board[i][j + 1] == player && board[i][j + 2] == player && board[i][j + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // diagonal
+        for (int i = 3; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT - 3; j++) {
+                if (board[i][j] == player && board[i - 1][j + 1] == player && board[i - 2][j + 2] == player && board[i - 3][j + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        for (int i = 3; i < WIDTH; i++) {
+            for (int j = 3; j < HEIGHT; j++) {
+                if (board[i][j] == player && board[i - 1][j - 1] == player && board[i - 2][j - 2] == player && board[i - 3][j - 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /** Check if the game is over.
+     * @return True if the game is over.
+     */
+    public boolean isGameOver() {
+        return moves == WIDTH * HEIGHT || hasWon(1) || hasWon(2);
+    }
+
+    /** Get winner of the game.
+     * @return The winner of the game.
+     */
+    public int getWinner() {
+        if (hasWon(1)) {
+            return 1;
+        } else if (hasWon(2)) {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
+
     /**
      * Get the number of moves made so far.
      * @return The number of moves made so far.
@@ -115,13 +178,21 @@ public class Position {
 
     @Override
     public String toString() {
+        // print it from the bottom up
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < HEIGHT; i++) {
+        for (int i = HEIGHT - 1; i >= 0; i--) {
+            sb.append(i + 1);
+            sb.append(" | ");
             for (int j = 0; j < WIDTH; j++) {
-                sb.append("[ " + board[j][i] + " ]");
+                sb.append(board[j][i] == 0 ? "[ . ]" : board[j][i] == 1 ? "[ X ]" : "[ O ]");
             }
             sb.append("\n");
         }
+        sb.append("    ");
+        for (int i = 0; i < WIDTH; i++) {
+            sb.append("  " + (i + 1) + "  ");
+        }
+        sb.append("\n");
         return sb.toString();
     }
 }
