@@ -10,23 +10,39 @@ This projects aims to implement a Connect Four solver in Java. Then, it will be 
 
 I have previously done this project using a simple Minimax algorithm, but I have decided to explore a more complex algorithm in order to create a more robust solver.
 
+## Success criteria
+
+The solver should be able to solve a given board in a reasonable amount of time: with every move, the solver should be able to determine whether it is winning or losing.
+
+- If it is winning, it should return a winning move for itself.
+- If it is losing, it should block the opponent from winning if there is a winning move available for the opponent.
+
 ## Roadmap
+
+### UI and game
 
 - [ ] Game board (classes for the board and the chips)
   - [ ] Display game board and its current state
   - [ ] Chip placement and conditions
   - [ ] Check if a player has won
-- [ ] Algorithm
-  - [X] MinMax algorithm
-  - [X] Alpha-beta algorithm
-  - [X] Move exploration order
-  - [ ] [Bitboard](https://github.com/cytronicoder/connect-four/issues/1)
-  - [ ] Transposition table
-  - [ ] Iterative deepening
-  - [ ] Anticipate losing moves
-  - [ ] Better move ordering
-  - [ ] Optimized transposition table
-  - [ ] Lower bound transposition table
+
+### The algorithm
+
+#### The essential parts
+
+- [X] MinMax algorithm
+- [X] Alpha-beta pruning
+- [X] Move exploration order
+
+#### The optional parts
+
+- [ ] Bitboard [(as described in the linked issue)](https://github.com/cytronicoder/connect-four/issues/1)
+- [ ] Transposition table
+- [ ] Iterative deepening
+- [ ] Anticipate losing moves
+- [ ] Better move ordering
+- [ ] Optimized transposition table
+- [ ] Lower bound transposition table
 
 ## Acknowledgements
 
