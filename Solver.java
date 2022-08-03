@@ -38,11 +38,36 @@ public class Solver {
                 Position newPos = new Position(pos);
                 newPos.move(columnOrder[x]);
                 int score = -negamax(newPos, -beta, -alpha);
-                if (score >= beta) return score;
-                if (score > alpha) alpha = score;
+                if (score >= beta) {
+                    return score;
+                }
+                if (score > alpha) {
+                    alpha = score;
+                }
             }
         }
-      return alpha;
+        return alpha;
+    }
+
+    /** Find the best column to move in using the negamax algorithm.
+     * @param pos The current position.
+     * @return The best column to move in.
+     */
+    public int findBestMove(Position pos) {
+        int bestChoice = -1;
+        int bestScore = -Position.WIDTH * Position.HEIGHT;
+        for (int x = 0; x < Position.WIDTH; x++) {
+            if (pos.canMove(x)) {
+                Position newPos = new Position(pos);
+                newPos.move(x);
+                int score = -negamax(newPos, -Position.WIDTH * Position.HEIGHT, Position.WIDTH * Position.HEIGHT);
+                if (score > bestScore) {
+                    bestChoice = x;
+                    bestScore = score;
+                }
+            }
+        }
+        return bestChoice;
     }
 
     public int solve(Position pos, boolean weak) {
