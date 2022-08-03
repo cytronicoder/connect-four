@@ -6,7 +6,7 @@ public class Position {
     private int height[] = new int[WIDTH]; // 1D array of the height of each column
     private int moves; // Number of moves made so far
 
-    /** Constructor */
+    /** Constructors */
     public Position() {
         // Initialize the board to empty
         for (int i = 0; i < WIDTH; i++) {
