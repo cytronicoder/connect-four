@@ -6,11 +6,8 @@ public class MoveSorter {
 
     private class Move {
         private long move;
-        private int score;
-
         public Move(long move, int score) {
             this.move = move;
-            this.score = score;
         }
     }
 
