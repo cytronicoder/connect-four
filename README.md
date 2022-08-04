@@ -37,10 +37,10 @@ The solver should be able to solve a given board in a reasonable amount of time:
 #### The optional parts
 
 - [X] Bitboard
-- [ ] Transposition table [(as described in the linked issue)](https://github.com/cytronicoder/connect-four/issues/2)
-- [ ] Iterative deepening
-- [ ] Anticipate losing moves
-- [ ] Better move ordering
+- [X] Transposition table
+- [X] Iterative deepening
+- [X] Anticipate losing moves
+- [X] Better move ordering
 - [ ] Optimized transposition table
 - [ ] Lower bound transposition table
 

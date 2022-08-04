@@ -6,12 +6,13 @@ public class Position {
 
     private long current_position;
     private long mask;
-    private int moves; // number of moves played since the beinning of the game.
-
+    private int moves; // number of moves played since the beinning of the game
+    
     public static final long bottom(int width, int height) {
         return width == 0 ? 0 : bottom(width - 1, height) | 1L << (width - 1) * (height + 1);
     }
 
+    /** Masks */
     private static final long bottom_mask = bottom(WIDTH, HEIGHT);
     private static final long board_mask = bottom_mask * ((1L << HEIGHT) - 1);
     
@@ -40,12 +41,18 @@ public class Position {
         moves = pos.moves;
     }
 
+    /** Play a move
+     * @param move the move to play
+     */
     public void play(long move) {
         current_position ^= mask;
         mask |= move;
         moves++;
     }
 
+    /** Play a sequence of moves
+     * @param seq the sequence of moves to play
+     */
     public int play(String seq) {
         for (int i = 0; i < seq.length(); i++) {
             int column = seq.charAt(i) - '1';
@@ -55,16 +62,9 @@ public class Position {
         return seq.length();
     }
 
+    /** Check if the current player can win in the next move */
     public boolean canWinNext() {
         return (winning_position() & possible()) != 0;
-    }
-
-    public int getMoves() {
-        return moves;
-    }
-
-    public long getKey() {
-        return current_position + mask;
     }
 
     public long possibleNonLosingMoves() {
@@ -85,6 +85,15 @@ public class Position {
 
     public int moveScore(long move) {
         return popcount(compute_winning_position(current_position | move, mask));
+    }
+
+    /** Getters */
+    public int getMoves() {
+        return moves;
+    }
+
+    public long getKey() {
+        return current_position + mask;
     }
 
     private void playColumn(int col) {
@@ -122,7 +131,7 @@ public class Position {
     }
 
     private long compute_winning_position(long position, long mask) {
-        // vertical;
+        // vertical
         long r = (position << 1) & (position << 2) & (position << 3);
 
         //horizontal
@@ -133,7 +142,7 @@ public class Position {
         r |= p & (position << (HEIGHT + 1));
         r |= p & (position >> 3 * (HEIGHT + 1));
 
-        //diagonal 1
+        //diagonals
         p = (position << HEIGHT) & (position << 2 * HEIGHT);
         r |= p & (position << 3 * HEIGHT);
         r |= p & (position >> HEIGHT);
@@ -141,7 +150,6 @@ public class Position {
         r |= p & (position << HEIGHT);
         r |= p & (position >> 3 * HEIGHT);
 
-        //diagonal 2
         p = (position << (HEIGHT + 2)) & (position << 2 * (HEIGHT + 2));
         r |= p & (position << 3 * (HEIGHT + 2));
         r |= p & (position >> (HEIGHT + 2));
