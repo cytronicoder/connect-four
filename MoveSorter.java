@@ -7,6 +7,11 @@ public class MoveSorter {
     private class Move {
         private long move;
         private int score;
+
+        public Move(long move, int score) {
+            this.move = move;
+            this.score = score;
+        }
     }
 
     public void add(long move, int score) {
@@ -15,9 +20,7 @@ public class MoveSorter {
         for (int i = size - 1; i > pos; i--) {
             entries[i] = entries[i - 1];
         }
-        entries[pos] = new Move();
-        entries[pos].move = move;
-        entries[pos].score = score;
+        entries[pos] = new Move(move, score);
     }
 
     public long getNext() {
