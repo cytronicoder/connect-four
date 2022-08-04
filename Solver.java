@@ -23,38 +23,29 @@ public class Solver {
     private static int negamax(Position pos, int alpha, int beta) {
         nodeCount++;
 
-        if (pos.getMoves() == Position.WIDTH * Position.HEIGHT) return 0;
+        long next = pos.possibleNonLoosingMoves();
+        if (next == 0) return -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
+        if (pos.getMoves() >= Position.WIDTH * Position.HEIGHT - 2) return 0;
 
-        for (int x = 0; x < Position.WIDTH; x++) {
-            if(pos.canMove(x) && pos.isWinningMove(x)) {
-                return (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves())/2;
-            }
-        }
-        
-        int max = (Position.WIDTH * Position.HEIGHT - 1 - pos.getMoves())/2;
-
-        int val;
-        if((val = transpositionTable.get(pos.getKey())) != 0) {
-            max = val + Position.MIN_SCORE - 1;
+        int min = -(Position.WIDTH * Position.HEIGHT - 2 - pos.getMoves()) / 2;
+        if (alpha < min) {
+            alpha = min;
+            if(alpha >= beta) return alpha;
         }
 
-        
+        int max = (Position.WIDTH * Position.HEIGHT - 1 - pos.getMoves()) / 2;
         if (beta > max) {
             beta = max;
-            if (alpha >= beta) return beta;
+            if(alpha >= beta) return beta;
         }
-        
+
         for (int x = 0; x < Position.WIDTH; x++) {
-            if (pos.canMove(columnOrder[x])) {
-                Position newPos = new Position(pos);
-                newPos.move(columnOrder[x]);
-                int score = -negamax(newPos, -beta, -alpha);
-                if (score >= beta) {
-                    return score;
-                }
-                if (score > alpha) {
-                    alpha = score;
-                }
+            if ((next & Position.column_mask(columnOrder[x])) != 0) {
+                Position nextPos = new Position(pos);
+                nextPos.play(columnOrder[x]);
+                int score = -negamax(nextPos, -beta, -alpha);
+                if(alpha >= beta) return alpha;
+                if(score > alpha) alpha = score;
             }
         }
 
@@ -62,54 +53,37 @@ public class Solver {
         return alpha;
     }
 
-    /** Find the best column to move in using the negamax algorithm.
-     * @param pos The current position.
-     * @return The best column to move in.
-     */
-    public int findBestMove(Position pos) {
-        int bestChoice = -1;
-        int bestScore = -Position.WIDTH * Position.HEIGHT;
-        for (int x = 0; x < Position.WIDTH; x++) {
-            if (pos.canMove(x)) {
-                Position newPos = new Position(pos);
-                newPos.move(x);
-                int score = -negamax(newPos, -Position.WIDTH * Position.HEIGHT, Position.WIDTH * Position.HEIGHT);
-                if (score > bestScore) {
-                    bestChoice = x;
-                    bestScore = score;
-                }
-            }
-        }
-        return bestChoice;
-    }
-    
     public int solve(Position pos, boolean weak) {
+        if (pos.canWinNext()) {
+            return (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
+        }
+        
         int min = -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
         int max = (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
         
-        // weak search configuration
-        if (weak) {
+        if(weak) {
             min = -1;
             max = 1;
         }
 
+        // iteratively narrow the min-max exploration window
         while(min < max) {
             int med = min + (max - min) / 2;
-
-            if ((med <= 0) && (min / 2 < med)) {
-                med = min/2;
-            } else if ((med >= 0) && (max/2 > med)) {
-                med = max/2;
+            if (med <= 0 && min/2 < med) {
+                med = min / 2;
+            } else if (med >= 0 && med/2 > med) {
+                med = med / 2;
             }
             
-            // use a null depth window
+            // use a null depth window 
             int r = negamax(pos, med, med + 1);
-            if (r <= med) {
+            if(r <= med) {
                 max = r;
             } else {
                 min = r;
             }
         }
+
         return min;
     }
 
