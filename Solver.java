@@ -2,9 +2,14 @@ public class Solver {
     private static long nodeCount;
     private static int columnOrder[] = new int[Position.WIDTH];
 
+    private static TranspositionTable transpositionTable;
+
     /** Constructor */
     public Solver() {
         nodeCount = 0;
+        transpositionTable = new TranspositionTable(8388593);
+
+        reset();
         for (int i = 0; i < Position.WIDTH; i++) {
             columnOrder[i] = Position.WIDTH / 2 + (1 - 2 * (i % 2)) * (i + 1) / 2;
         }
@@ -27,6 +32,12 @@ public class Solver {
         }
         
         int max = (Position.WIDTH * Position.HEIGHT - 1 - pos.getMoves())/2;
+
+        int val;
+        if((val = transpositionTable.get(pos.getKey())) != 0) {
+            max = val + Position.MIN_SCORE - 1;
+        }
+
         
         if (beta > max) {
             beta = max;
@@ -46,6 +57,8 @@ public class Solver {
                 }
             }
         }
+
+        transpositionTable.put(pos.getKey(), (byte) (alpha - Position.MIN_SCORE + 1));
         return alpha;
     }
 
@@ -81,5 +94,10 @@ public class Solver {
 
     public long getNodeCount() {
         return nodeCount;
+    }
+
+    public void reset() {
+      nodeCount = 0;
+      transpositionTable.reset();
     }
 }

@@ -1,39 +1,42 @@
 public class TranspositionTable {
-    private static class Entry {
+    private class Entry {
         private long key;
         private byte value;
+
+        public Entry(long key, byte value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 
-    private static Entry[] entries;
+    private Entry[] table;
 
-    private static long index(long key) {
-        return key % entries.length;
+    private long index(long key) {
+        return key % table.length;
     }
 
-    public TranspositionTable(int size) {
-        entries = new Entry[size];
+    public TranspositionTable(long size) {
+        table = new Entry[(int) size];
     }
 
     public void reset() {
-        // fill everything with 0
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = new Entry();
-            entries[i].key = 0;
-            entries[i].value = 0;
+        for (int i = 0; i < table.length; i++) {
+            table[i] = new Entry((long) 0, (byte) 0);
         }
     }
 
     public void put(long key, byte value) {
         int index = (int) index(key);
-        entries[index].key = key;
-        entries[index].value = value;
+        table[index].key = key;
+        table[index].value = value;
     }
 
     public byte get(long key) {
         int index = (int) index(key);
-        if (entries[index].key == key) {
-            return entries[index].value;
+        if (table[index].key == key) {
+            return table[index].value;
+        } else {
+            return 0;
         }
-        return 0;
     }
 }
