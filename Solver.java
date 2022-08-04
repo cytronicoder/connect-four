@@ -84,12 +84,33 @@ public class Solver {
     }
 
     public int solve(Position pos, boolean weak) {
-        nodeCount = 0;
+        int min = -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
+        int max = (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
+        
+        // weak search configuration
         if (weak) {
-            return negamax(pos, -1, 1); 
-        } else {
-            return negamax(pos, -Position.WIDTH * Position.HEIGHT / 2, Position.WIDTH * Position.HEIGHT / 2); // a stronger heuristic that is more time consuming
+            min = -1;
+            max = 1;
         }
+
+        while(min < max) {
+            int med = min + (max - min) / 2;
+
+            if ((med <= 0) && (min / 2 < med)) {
+                med = min/2;
+            } else if ((med >= 0) && (max/2 > med)) {
+                med = max/2;
+            }
+            
+            // use a null depth window
+            int r = negamax(pos, med, med + 1);
+            if (r <= med) {
+                max = r;
+            } else {
+                min = r;
+            }
+        }
+        return min;
     }
 
     public long getNodeCount() {
