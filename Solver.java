@@ -82,7 +82,7 @@ public class Solver {
         }
         return bestChoice;
     }
-
+    
     public int solve(Position pos, boolean weak) {
         int min = -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
         int max = (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
