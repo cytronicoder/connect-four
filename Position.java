@@ -2,23 +2,17 @@ public class Position {
     public static int WIDTH = 7;  // Width of the board
     public static int HEIGHT = 6; // Height of the board
 
-    private int board[][] = new int[WIDTH][HEIGHT]; // 2D array of the board
-    private int height[] = new int[WIDTH]; // 1D array of the height of each column
+    private long current_position; // The current position of the board represented as a bitboard
+    private long mask; // Bitmask for the current position
     private int moves; // Number of moves made so far
 
-    /** Constructor */
+    /** Constructors */
     public Position() {
         // Initialize the board to empty
-        for (int i = 0; i < WIDTH; i++) {
-            for (int j = 0; j < HEIGHT; j++) {
-                board[i][j] = 0;
-            }
-        }
+        current_position = 0;
 
-        // Initialize the height of each column to 0
-        for (int i = 0; i < WIDTH; i++) {
-            height[i] = 0;
-        }
+        // Initialize the mask to empty
+        mask = 0;
 
         // Initialize the moves to 0
         moves = 0;
@@ -26,18 +20,8 @@ public class Position {
 
     public Position(Position pos) {
         // Copy the board
-        for (int i = 0; i < WIDTH; i++) {
-            for (int j = 0; j < HEIGHT; j++) {
-                board[i][j] = pos.board[i][j];
-            }
-        }
-
-        // Copy the height
-        for (int i = 0; i < WIDTH; i++) {
-            height[i] = pos.height[i];
-        }
-
-        // Copy the moves
+        current_position = pos.current_position;
+        mask = pos.mask;
         moves = pos.moves;
     }
 
@@ -47,7 +31,7 @@ public class Position {
      * @return True if the current player can make a move at the given column.
      */
     public boolean canMove(int column) {
-        return height[column] < HEIGHT;
+        return (mask & top_mask(column)) == 0;
     }
 
     /**
@@ -55,8 +39,8 @@ public class Position {
      * @param column The column to make the move at.
      */
     public void move(int column) {
-        board[column][height[column]] = moves % 2 + 1;
-        height[column]++;
+        current_position ^= mask;
+        mask |= mask + bottom_mask(column);
         moves++;
     }
 
@@ -81,30 +65,12 @@ public class Position {
      * @return True if there is a winning move for the current player in the given column.
      */
     public boolean isWinningMove(int column) {
-        int currentPlayer = moves % 2 + 1;
-        
-        if(height[column] >= 3 
-            && board[column][height[column] - 1] == currentPlayer 
-            && board[column][height[column] - 2] == currentPlayer 
-            && board[column][height[column] - 3] == currentPlayer) {
-          return true;
-        }
-
-        for (int dy = -1; dy <= 1; dy++) {
-            int nb = 0;
-            for (int dx = -1; dx <= 1; dx += 2) {
-                for (int x = column + dx, y = height[column] + dx * dy;
-                     x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT && 
-                     board[x][y] == currentPlayer; nb++) {
-                    x += dx;
-                    y += dx * dy;
-                }
-                if(nb >= 3) return true;
-            }
-        }
-        return false;
+        long pos = current_position; 
+        pos |= (mask + bottom_mask(column)) & column_mask(column);
+        return alignment(pos);
     }
-
+    
+    /** GETTERS */
     /**
      * Get the number of moves made so far.
      * @return The number of moves made so far.
@@ -113,12 +79,68 @@ public class Position {
         return moves;
     }
 
+    /** Get the key of the current position.
+     * @return The key of the current position.
+     */
+    public long getKey() {
+        return current_position + mask;
+    }
+
+    /** PRIVATE METHODS */
+    /** Check if the given position is a winning position.
+     * @param pos The position to check.
+     * @return True if the given position is a winning position.
+     */
+    private static boolean alignment(long pos) {
+        // horizontal 
+        long m = pos & (pos >> (HEIGHT + 1));
+        
+        if((m & (m >> (2 * (HEIGHT + 1)))) != 0) return true;
+
+        // diagonal 1
+        m = pos & (pos >> HEIGHT);
+        if((m & (m >> (2 * HEIGHT))) != 0) return true;
+
+        // diagonal 2 
+        m = pos & (pos >> (HEIGHT + 2));
+        if((m & (m >> (2 * (HEIGHT + 2)))) != 0) return true;
+
+        // vertical;
+        m = pos & (pos >> 1);
+        if((m & (m >> 2)) != 0) return true;
+
+        return false;
+    }
+
+    /** GET MASKS */
+    private static long top_mask(int col) {
+        return (1L << (HEIGHT - 1)) << col * (HEIGHT + 1);
+    }
+
+    private static long bottom_mask(int col) {
+        return 1L << col * (HEIGHT + 1);
+    }
+    
+    private static long column_mask(int col) {
+        return ((1L << HEIGHT) - 1) << col * (HEIGHT + 1); 
+    }
+
+    /** Turn the given position into a string.
+     * @param pos The position to turn into a string.
+     * @return The string representation of the given position.
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                sb.append("[ " + board[j][i] + " ]");
+                if((current_position & bottom_mask(j)) != 0) {
+                    sb.append("X");
+                } else if((mask & bottom_mask(j)) != 0) {
+                    sb.append("O");
+                } else {
+                    sb.append(".");
+                }
             }
             sb.append("\n");
         }
