@@ -40,17 +40,17 @@ public class Position {
         moves = pos.moves;
     }
 
-    public void play(int column) {
-      current_position ^= mask;
-      mask |= mask + bottom_mask_col(column);
-      moves++;
+    public void play(long move) {
+        current_position ^= mask;
+        mask |= move;
+        moves++;
     }
 
     public int play(String seq) {
         for (int i = 0; i < seq.length(); i++) {
             int column = seq.charAt(i) - '1';
             if (column < 0 || column >= Position.WIDTH || !canPlay(column) || isWinningMove(column)) return i; // invalid move
-            play(column);
+            playColumn(column);
         }
         return seq.length();
     }
@@ -67,7 +67,7 @@ public class Position {
         return current_position + mask;
     }
 
-    public long possibleNonLoosingMoves() {
+    public long possibleNonLosingMoves() {
         long possible_mask = possible();
         long opponent_win = opponent_winning_position();
         long forced_moves = possible_mask & opponent_win;
@@ -81,6 +81,14 @@ public class Position {
         }
         
         return possible_mask & ~(opponent_win >> 1);
+    }
+
+    public int moveScore(long move) {
+        return popcount(compute_winning_position(current_position | move, mask));
+    }
+
+    private void playColumn(int col) {
+        play((mask + bottom_mask_col(col)) & column_mask(col));
     }
 
     private boolean canPlay(int column) {
@@ -101,6 +109,16 @@ public class Position {
 
     private long possible() {
         return (mask + bottom_mask) & board_mask;
+    }
+
+    private static int popcount(long m) {
+        int c = 0; 
+
+        for (c = 0; m != 0; c++) {
+            m &= m - 1;
+        }
+
+        return c;
     }
 
     private long compute_winning_position(long position, long mask) {

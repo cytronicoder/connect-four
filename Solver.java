@@ -23,7 +23,7 @@ public class Solver {
     private static int negamax(Position pos, int alpha, int beta) {
         nodeCount++;
 
-        long next = pos.possibleNonLoosingMoves();
+        long next = pos.possibleNonLosingMoves();
         if (next == 0) return -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
         if (pos.getMoves() >= Position.WIDTH * Position.HEIGHT - 2) return 0;
 
@@ -39,14 +39,22 @@ public class Solver {
             if(alpha >= beta) return beta;
         }
 
-        for (int x = 0; x < Position.WIDTH; x++) {
-            if ((next & Position.column_mask(columnOrder[x])) != 0) {
-                Position nextPos = new Position(pos);
-                nextPos.play(columnOrder[x]);
-                int score = -negamax(nextPos, -beta, -alpha);
-                if(alpha >= beta) return alpha;
-                if(score > alpha) alpha = score;
+        MoveSorter moves = new MoveSorter();
+
+        for(int i = Position.WIDTH - 1; i >= 0; i--) {
+            long move;
+            if((move = next & Position.column_mask(columnOrder[i])) != 0) {
+                moves.add(move, pos.moveScore(move));
             }
+        }
+
+        long nextMove;
+        while ((nextMove = moves.getNext()) != 0) {
+            Position next_pos = new Position(pos);
+            next_pos.play(nextMove);
+            int score = -negamax(next_pos, -beta, -alpha);
+            if (score >= beta) return score;
+            if(score > alpha) alpha = score;
         }
 
         transpositionTable.put(pos.getKey(), (byte) (alpha - Position.MIN_SCORE + 1));
