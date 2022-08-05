@@ -26,28 +26,37 @@ public class Main {
         }
 
         br.close();
+        
+        // newline
+        System.out.println();
 
-        while (true) {
-            // newline
-            System.out.println();
+        // get user input for the move string and the heuristic setting
+        System.out.print("Enter a move string: ");
+        String moves = in.nextLine();
 
-            // get user input for the move string and the heuristic setting
-            System.out.print("Enter a move string: ");
-            String move = in.next();
-            System.out.print("Weak heuristic? (true/false): ");
-            boolean weak = in.nextBoolean();
+        System.out.print("Enter a heuristic setting (0 for weak, 1 for strong): ");
+        boolean weak = (in.nextInt() == 0);
 
-            // play the move string
-            int moveCount = pos.play(move);
-            if (moveCount != move.length()) {
-                System.out.println("Invalid move: shutting down");
-                break;
-            } else {
-                // solve the position
-                int score = solver.solve(pos, weak);
-                System.out.println(ConsoleColors.GREEN + "Score: " + score + ConsoleColors.RESET);
-                // TODO: Implement a method that returns the best column for the current player to move to
-            }
+        // newline
+        System.out.println();
+
+        System.out.println("Solving...");
+
+        // newline
+        System.out.println();
+
+        // play the move string
+        int moveCount = pos.play(moves);
+        if (moveCount != moves.length()) {
+            System.out.println("Invalid move: shutting down");
+        } else {
+            // solve the position
+            int startTime = (int) System.currentTimeMillis();
+            int score = solver.solve(pos, weak);
+            int endTime = (int) System.currentTimeMillis();
+
+            System.out.println(ConsoleColors.GREEN + "Position solved in " + pos.getMoves() + " moves with score " + score + " in " + (endTime - startTime) + "ms" + ConsoleColors.RESET);
+            System.out.println("Best move: " + solver.chooseMove(pos));
         }
         
         in.close();
