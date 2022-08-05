@@ -87,6 +87,10 @@ public class Position {
         return popcount(compute_winning_position(current_position | move, mask));
     }
 
+    public boolean canPlay(int column) {
+        return (mask & top_mask_col(column)) == 0;
+    }
+
     /** Getters */
     public int getMoves() {
         return moves;
@@ -98,10 +102,6 @@ public class Position {
 
     private void playColumn(int col) {
         play((mask + bottom_mask_col(col)) & column_mask(col));
-    }
-
-    private boolean canPlay(int column) {
-        return (mask & top_mask_col(column)) == 0;
     }
 
     private boolean isWinningMove(int column) {

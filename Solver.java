@@ -95,12 +95,23 @@ public class Solver {
         return min;
     }
 
+    /** Get the best move for the current player to play.
+     * @param pos the current position
+     * @return the column number of the best move
+     */
+    public int chooseMove(Position pos) {
+        // TODO: Implement a method that returns the best column for the current player to move to.
+        return 0;
+    }
+    
+    /** Reset the solver */
+    public void reset() {
+        nodeCount = 0;
+        transpositionTable.reset();
+    }
+    
+    /** Get the number of nodes visited */
     public long getNodeCount() {
         return nodeCount;
-    }
-
-    public void reset() {
-      nodeCount = 0;
-      transpositionTable.reset();
     }
 }
