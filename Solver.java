@@ -99,9 +99,26 @@ public class Solver {
      * @param pos the current position
      * @return the column number of the best move
      */
-    public int chooseMove(Position pos) {
-        // TODO: Implement a method that returns the best column for the current player to move to.
-        return 0;
+    public int chooseMove(Position pos, boolean weak) {
+        // perform negamax on a single column
+        int best_move = -1;
+        int best_score = -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
+
+        for (int i = 0; i < Position.WIDTH; i++) {
+            long move = pos.possibleNonLosingMoves() & Position.column_mask(i);
+            if (move != 0) {
+                Position next_pos = new Position(pos);
+                next_pos.play(move);
+                int score = -solve(next_pos, weak);
+
+                if (score > best_score) {
+                    best_score = score;
+                    best_move = i;
+                }
+            }
+        }
+
+        return best_move;
     }
     
     /** Reset the solver */

@@ -50,6 +50,10 @@ public class Position {
         moves++;
     }
 
+    public void play(int col) {
+        play(column_mask(col));
+    }
+
     /** Play a sequence of moves
      * @param seq the sequence of moves to play
      */
