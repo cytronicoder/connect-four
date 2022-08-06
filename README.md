@@ -17,33 +17,6 @@ The solver should be able to solve a given board in a reasonable amount of time:
 - If it is winning, it should return a winning move for itself.
 - If it is losing, it should block the opponent from winning if there is a winning move available for the opponent.
 
-## Roadmap
-
-### UI and game
-
-- [ ] Game board (classes for the board and the chips)
-  - [ ] Display game board and its current state
-  - [ ] Chip placement and conditions
-  - [ ] Check if a player has won
-
-### The algorithm
-
-#### The essential parts
-
-- [X] MinMax algorithm
-- [X] Alpha-beta pruning
-- [X] Move exploration order
-
-#### The optional parts
-
-- [X] Bitboard
-- [X] Transposition table
-- [X] Iterative deepening
-- [X] Anticipate losing moves
-- [X] Better move ordering
-- [ ] Optimized transposition table
-- [ ] Lower bound transposition table
-
 ## Acknowledgements
 
-I would like to thank [@PascalPons](https://github.com/PascalPons) for his tutorial on [the perfect Connect Four Solver](https://blog.gamesolver.org/): it was a great help to understand how the algorithm should be implemented.
+I would like to thank [@PascalPons](https://github.com/PascalPons) for his tutorial on [the perfect Connect Four Solver](https://blog.gamesolver.org/): it was a great help to understand how the algorithm should be implemented. Additionally, many thanks to [Nick Drohan](https://www.linkedin.com/in/nick-drohan-b8a75014/) and [Rishab Nayak](https://github.com/rishabnayak) for guiding me through this and providing assistance - you guys are amazing.
