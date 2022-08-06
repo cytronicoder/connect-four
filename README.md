@@ -1,3 +1,5 @@
+### 📂 This repository is now archived as a finished project.
+
 # Solving Connect Four
 
 ## Premise
