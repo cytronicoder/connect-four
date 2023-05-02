@@ -1,6 +1,8 @@
 public class Position {
     public static final int WIDTH = 7;
     public static final int HEIGHT = 6;
+    public static final int MIN_SCORE = -(WIDTH * HEIGHT) / 2 + 3;
+    public static final int MAX_SCORE = (WIDTH * HEIGHT + 1) / 2 - 3;
 
     private long current_position;
     private long mask;
