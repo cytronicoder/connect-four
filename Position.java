@@ -2,39 +2,29 @@ public class Position {
     public static final int WIDTH = 7;
     public static final int HEIGHT = 6;
 
-    private int board[][] = new int[WIDTH][HEIGHT];
-    private int tokens[] = new int[WIDTH];
-    private int moves = 0;
+    private long current_position;
+    private long mask;
+    private int moves;
 
     public Position() {
-        for (int i = 0; i < WIDTH; i++) {
-            tokens[i] = 0;
-            for (int j = 0; j < HEIGHT; j++) {
-                board[i][j] = 0;
-            }
-        }
-
+        current_position = 0;
+        mask = 0;
         moves = 0;
     }
 
     public Position(Position P) {
-        for (int i = 0; i < WIDTH; i++) {
-            tokens[i] = P.tokens[i];
-            for (int j = 0; j < HEIGHT; j++) {
-                board[i][j] = P.board[i][j];
-            }
-        }
-
+        current_position = P.current_position;
+        mask = P.mask;
         moves = P.moves;
     }
 
     public boolean playable(int col) {
-        return (tokens[col] < HEIGHT);
+        return (mask & top_mask(col)) == 0;
     }
 
     public void play(int col) {
-        board[col][tokens[col]] = moves % 2 + 1;
-        tokens[col]++;
+        current_position ^= mask;
+        mask |= (mask + bottom_mask(col));
         moves++;
     }
 
@@ -50,34 +40,52 @@ public class Position {
     }
 
     public boolean winsByPlaying(int col) {
-        int player = (moves % 2) + 1;
+        long pos = current_position;
+        pos |= (mask + bottom_mask(col)) & column_mask(col);
+        return alignment(pos);
+    }
 
-        if (tokens[col] >= 3) {
-            if (board[col][tokens[col] - 1] == player && board[col][tokens[col] - 2] == player
-                    && board[col][tokens[col] - 3] == player) {
-                return true;
-            }
+    public int getMoves() {
+        return moves;
+    }
+
+    public long key() {
+        return current_position + mask;
+    }
+
+    private boolean alignment(long pos) {
+        long m = pos & (pos >> (HEIGHT + 1));
+        if ((m & (m >> (2 * (HEIGHT + 1)))) != 0) {
+            return true;
         }
 
-        for (int dy = -1; dy <= 1; dy++) {
-            int aligned = 0;
-            for (int dx = -1; dx <= 1; dx += 2) {
-                for (int x = col + dx, y = tokens[col] + dx * dy; x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT
-                        && board[x][y] == player; aligned++) {
-                    x += dx;
-                    y += dx * dy;
-                }
-            }
+        m = pos & (pos >> HEIGHT);
+        if ((m & (m >> (2 * HEIGHT))) != 0) {
+            return true;
+        }
 
-            if (aligned >= 3) {
-                return true;
-            }
+        m = pos & (pos >> (HEIGHT + 2));
+        if ((m & (m >> (2 * (HEIGHT + 2)))) != 0) {
+            return true;
+        }
+
+        m = pos & (pos >> 1);
+        if ((m & (m >> 2)) != 0) {
+            return true;
         }
 
         return false;
     }
 
-    public int getMoves() {
-        return moves;
+    private long top_mask(int col) {
+        return (1L << (HEIGHT - 1)) << col * (HEIGHT + 1);
+    }
+
+    private long bottom_mask(int col) {
+        return 1L << col * (HEIGHT + 1);
+    }
+
+    private long column_mask(int col) {
+        return ((1L << HEIGHT) - 1) << col * (HEIGHT + 1);
     }
 }
