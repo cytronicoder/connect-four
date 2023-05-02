@@ -24,7 +24,7 @@ public class Main {
 
                 Position P = new Position();
                 P.play(seq);
-
+                
                 int score = solver.solve(P);
 
                 if (score != expectedScore) {
@@ -32,6 +32,8 @@ public class Main {
                     br.close();
                     return;
                 }
+
+                System.out.println(seq + " " + score);
             }
 
             br.close();
