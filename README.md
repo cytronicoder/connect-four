@@ -1,4 +1,8 @@
-### 📂 This repository is now archived as a finished project.
+<details>
+    <summary>🚀 I'm rebooting this project!</summary>
+    <p>I'm building this project (again) from the ground up, this time using a more object-oriented approach. I'm also using this project to learn more about <a href="https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning">alpha-beta pruning</a> and <a href="https://en.wikipedia.org/wiki/Transposition_table">transposition tables</a> in order to improve the performance of the solver.</p>
+    <p> I will be posting updates on my progress on my <a href="https://twitter.com/cytronicoder">Twitter,</a> so follow me there if you want to stay updated! </p>
+</details>
 
 # Solving Connect Four
 
@@ -21,4 +25,4 @@ The solver should be able to solve a given board in a reasonable amount of time:
 
 ## Acknowledgements
 
-I would like to thank [@PascalPons](https://github.com/PascalPons) for his tutorial on [the perfect Connect Four Solver](https://blog.gamesolver.org/): it was a great help to understand how the algorithm should be implemented. Additionally, many thanks to [Nick Drohan](https://www.linkedin.com/in/nick-drohan-b8a75014/) and [Rishab Nayak](https://github.com/rishabnayak) for guiding me through this and providing assistance - you guys are amazing.
+I would like to thank [@PascalPons](https://github.com/PascalPons) for his tutorial on [the perfect Connect Four Solver](http://blog.gamesolver.org/): it was a great help to understand how the algorithm should be implemented. Additionally, many thanks to [Nick Drohan](https://www.linkedin.com/in/nick-drohan-b8a75014/) and [Rishab Nayak](https://github.com/rishabnayak) for guiding me through this and providing assistance - you guys are amazing.
