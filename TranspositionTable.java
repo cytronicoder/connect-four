@@ -1,59 +1,41 @@
+import java.util.Arrays;
+
 public class TranspositionTable {
-    /** An entry in the transposition table.
-     * Each entry has a 56 bit key and an 8 bit score.
-     */
-    private class Entry {
-        private long key;
-        private byte value;
+    private static class Entry {
+        public long key;
+        public byte val;
 
-        public Entry(long key, byte value) {
+        public Entry(long key, byte val) {
             this.key = key;
-            this.value = value;
+            this.val = val;
         }
     }
-    
-    private Entry[] table;
 
-    /** Get the index of the entry with the given key.
-     * @param key The key of the entry.
-     * @return The index of the entry with the given key.
-     */
-    private long index(long key) {
-        return key % table.length;
+    private Entry[] entries;
+
+    public TranspositionTable(int size) {
+        entries = new Entry[size];
+        Arrays.fill(entries, new Entry(0, (byte) 0));
     }
 
-    /** Constructor */
-    public TranspositionTable(long size) {
-        table = new Entry[(int) size];
-    }
-
-    /** Reset the transposition table. */
     public void reset() {
-        for (int i = 0; i < table.length; i++) {
-            table[i] = new Entry((long) 0, (byte) 0);
-        }
+        Arrays.fill(entries, new Entry(0, (byte) 0));
     }
 
-    /** Insert an entry into the transposition table.
-     * @param key The key of the entry.
-     * @param value The value of the entry.
-     */
-    public void put(long key, byte value) {
-        int index = (int) index(key);
-        table[index].key = key;
-        table[index].value = value;
+    public void put(long key, byte val) {
+        int i = index(key);
+        entries[i] = new Entry(key, val);
     }
 
-    /** Get the value of the entry with the given key.
-     * @param key The key of the entry.
-     * @return The value of the entry with the given key.
-     */
     public byte get(long key) {
-        int index = (int) index(key);
-        if (table[index].key == key) {
-            return table[index].value;
-        } else {
+        int i = index(key);
+        if (entries[i].key == key)
+            return entries[i].val;
+        else
             return 0;
-        }
+    }
+
+    private int index(long key) {
+        return (int) (key % entries.length);
     }
 }

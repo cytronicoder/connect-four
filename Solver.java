@@ -1,134 +1,85 @@
 public class Solver {
-    private static long nodeCount;
-    private static int columnOrder[] = new int[Position.WIDTH];
+    private long nodes = 0;
+    private int[] columnOrder = new int[Position.WIDTH];
+    private TranspositionTable transpositionTable = new TranspositionTable(8388593);
 
-    private static TranspositionTable transpositionTable;
-
-    /** Constructor */
     public Solver() {
-        nodeCount = 0;
-        transpositionTable = new TranspositionTable(8388593);
-
         reset();
+
         for (int i = 0; i < Position.WIDTH; i++) {
             columnOrder[i] = Position.WIDTH / 2 + (1 - 2 * (i % 2)) * (i + 1) / 2;
         }
     }
 
-    /** A position has
-     * a positive score if the current player has a winning move,
-     * a negative score if the opponent has a winning move,
-     * and a score of 0 if neither player has a winning move.
-     */
-    private static int negamax(Position pos, int alpha, int beta) {
-        nodeCount++;
+    private int negamax(Position pos, int alpha, int beta) {
+        assert alpha < beta;
+        nodes++;
 
-        long next = pos.possibleNonLosingMoves();
-        if (next == 0) return -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
-        if (pos.getMoves() >= Position.WIDTH * Position.HEIGHT - 2) return 0;
+        if (pos.getMoves() == Position.WIDTH * Position.HEIGHT) {
+            return 0;
+        }
 
-        int min = -(Position.WIDTH * Position.HEIGHT - 2 - pos.getMoves()) / 2;
-        if (alpha < min) {
-            alpha = min;
-            if(alpha >= beta) return alpha;
+        for (int x = 0; x < Position.WIDTH; x++) {
+            if (pos.playable(x) && pos.winsByPlaying(x)) {
+                return (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
+            }
         }
 
         int max = (Position.WIDTH * Position.HEIGHT - 1 - pos.getMoves()) / 2;
+        int val = transpositionTable.get(pos.key());
+        
+        if (val != 0) {
+            max = val + Position.MIN_SCORE - 1;
+        }
+
         if (beta > max) {
             beta = max;
-            if(alpha >= beta) return beta;
-        }
-
-        MoveSorter moves = new MoveSorter();
-
-        for(int i = Position.WIDTH - 1; i >= 0; i--) {
-            long move;
-            if((move = next & Position.column_mask(columnOrder[i])) != 0) {
-                moves.add(move, pos.moveScore(move));
+            if (alpha >= beta) {
+                return beta;
             }
         }
 
-        long nextMove;
-        while ((nextMove = moves.getNext()) != 0) {
-            Position next_pos = new Position(pos);
-            next_pos.play(nextMove);
-            int score = -negamax(next_pos, -beta, -alpha);
-            if (score >= beta) return score;
-            if(score > alpha) alpha = score;
-        }
-
-        transpositionTable.put(pos.getKey(), (byte) (alpha - Position.MIN_SCORE + 1));
-        return alpha;
-    }
-
-    public int solve(Position pos, boolean weak) {
-        if (pos.canWinNext()) {
-            return (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
-        }
-        
-        int min = -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
-        int max = (Position.WIDTH * Position.HEIGHT + 1 - pos.getMoves()) / 2;
-        
-        if(weak) {
-            min = -1;
-            max = 1;
-        }
-
-        // iteratively narrow the min-max exploration window
-        while(min < max) {
-            int med = min + (max - min) / 2;
-            if (med <= 0 && min/2 < med) {
-                med = min / 2;
-            } else if (med >= 0 && med/2 > med) {
-                med = med / 2;
-            }
-            
-            // use a null depth window 
-            int r = negamax(pos, med, med + 1);
-            if(r <= med) {
-                max = r;
-            } else {
-                min = r;
-            }
-        }
-
-        return min;
-    }
-
-    /** Get the best move for the current player to play.
-     * @param pos the current position
-     * @return the column number of the best move
-     */
-    public int chooseMove(Position pos, boolean weak) {
-        // perform negamax on a single column
-        int best_move = -1;
-        int best_score = -(Position.WIDTH * Position.HEIGHT - pos.getMoves()) / 2;
-
-        for (int i = 0; i < Position.WIDTH; i++) {
-            long move = pos.possibleNonLosingMoves() & Position.column_mask(i);
-            if (move != 0) {
-                Position next_pos = new Position(pos);
-                next_pos.play(move);
-                int score = -solve(next_pos, weak);
-
-                if (score > best_score) {
-                    best_score = score;
-                    best_move = i;
+        for (int x = 0; x < Position.WIDTH; x++) {
+            if (pos.playable(columnOrder[x])) {
+                Position next = new Position(pos);
+                next.play(columnOrder[x]);
+                int score = -negamax(next, -beta, -alpha);
+                if (score >= beta) {
+                    return score;
+                }
+                if (score > alpha) {
+                    alpha = score;
                 }
             }
         }
 
-        return best_move;
+        transpositionTable.put(pos.key(), (byte) (alpha - Position.MIN_SCORE + 1));
+        return alpha;
     }
-    
-    /** Reset the solver */
+
+    public int solve(Position pos) {
+        nodes = 0;
+        return negamax(pos, -Position.WIDTH * Position.HEIGHT / 2, Position.WIDTH * Position.HEIGHT / 2);
+    }
+
+    public long getNodes() {
+        return nodes;
+    }
+
     public void reset() {
-        nodeCount = 0;
+        nodes = 0;
         transpositionTable.reset();
     }
-    
-    /** Get the number of nodes visited */
-    public long getNodeCount() {
-        return nodeCount;
+}
+
+class Timer {
+    private long start;
+
+    public Timer() {
+        start = System.nanoTime();
+    }
+
+    public long elapsed() {
+        return System.nanoTime() - start;
     }
 }
